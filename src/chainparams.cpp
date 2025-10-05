@@ -287,11 +287,10 @@ consensus.hashGenesisBlock = genesis.GetHash();
 	17ed2b28300e7ec4c4c1dff1d3f1268b7857a4ddb"));
 
         vFixedSeeds.clear();
-        vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("z.cash", "dnsseed.z.cash")); // Zcash
-        vSeeds.push_back(CDNSSeedData("str4d.xyz", "dnsseed.str4d.xyz")); // @str4d
-        vSeeds.push_back(CDNSSeedData("zfnd.org", "mainnet.seeder.zfnd.org")); // Zcash Foundation
-        vSeeds.push_back(CDNSSeedData("yolo.money", "mainnet.is.yolo.money")); // gtank
+        vSeeds.clear();// Shifocoin seed nodes - ADD YOUR OWN SEED NODES HERE LATER
+// vSeeds.push_back(CDNSSeedData("shifocoin.org", "seed1.shifocoin.org"));
+// For now, leave empty until you set up seed nodes
+
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
