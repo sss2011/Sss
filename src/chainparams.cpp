@@ -87,7 +87,7 @@ class CMainParams : public CChainParams {
 public:
     CMainParams() {
         keyConstants.strNetworkID = "shifocoin";
-        strCurrencyUnits = "shifo";
+        strCurrencyUnits = "SHFO";    // Standard cryptocurrency ticker format
         keyConstants.bip44CoinType = 133; // As registered in https://github.com/satoshilabs/slips/blob/master/slip-0044.md
         consensus.fCoinbaseMustBeShielded = true;
         consensus.nSubsidySlowStartInterval = 20000;
@@ -268,12 +268,12 @@ keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x3F,0xBD};
         /**
          * The message start string should be awesome! ⓩ❤
          */
-        pchMessageStart[0] = 0x24;
+        pchMessageStart[0] = 0x53;    // Change to 0x53 for 'S'
         pchMessageStart[1] = 0x48;  // 'H'
         pchMessageStart[2] = 0x46;  // 'F'
         pchMessageStart[3] = 0x4F;  // 'O'
         vAlertPubKey = ParseHex("04b7ecf0baa90495ceb4e4090f6b2fd37eec1e9c85fac68a487f3ce11589692e4a317479316ee814e066638e1db54e37a10689b70286e6315b1087b6615d179264");
-        nDefaultPort = 8233;
+        nDefaultPort = 9033;    // Shifocoin port
         nPruneAfterHeight = 100000;
 a1db1266ea15dd06b4a8a5c453883c000b031973dce08"));
 genesis = CreateGenesisBlock(
