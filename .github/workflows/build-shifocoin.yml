@@ -1,0 +1,65 @@
+name: Build Shifocoin
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build Shifocoin
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          df -h
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential pkg-config libc6-dev m4 g++-multilib \
+            autoconf libtool ncurses-dev unzip git python3 python3-zmq \
+            zlib1g-dev curl bsdmainutils automake libtinfo5
+      
+      - name: Cache Zcash parameters
+        id: cache-params
+        uses: actions/cache@v3
+        with:
+          path: ~/.zcash-params
+          key: zcash-params-v1
+      
+      - name: Download Zcash parameters
+        if: steps.cache-params.outputs.cache-hit != 'true'
+        run: ./zcutil/fetch-params.sh
+      
+      - name: Build Shifocoin
+        run: ./zcutil/build.sh -j$(nproc)
+        timeout-minutes: 90
+      
+      - name: Verify build
+        run: |
+          ls -lh src/shifocoind src/shifocoin-cli src/shifocoin-tx
+          ./src/shifocoind --version
+      
+      - name: Package binaries
+        run: |
+          mkdir -p shifocoin-release
+          cp src/shifocoind shifocoin-release/
+          cp src/shifocoin-cli shifocoin-release/
+          cp src/shifocoin-tx shifocoin-release/
+          tar -czf shifocoin-linux-x64.tar.gz shifocoin-release/
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: shifocoin-linux-binaries
+          path: shifocoin-linux-x64.tar.gz
+          retention-days: 30
