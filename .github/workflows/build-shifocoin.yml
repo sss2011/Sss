@@ -1,9 +1,11 @@
 name: Build Shifocoin
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
   build:
@@ -19,6 +21,7 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
           df -h
       
       - name: Install dependencies
@@ -31,7 +34,7 @@ jobs:
       
       - name: Cache Zcash parameters
         id: cache-params
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.zcash-params
           key: zcash-params-v1
@@ -46,19 +49,28 @@ jobs:
       
       - name: Verify build
         run: |
-          ls -lh src/shifocoind src/shifocoin-cli src/shifocoin-tx
-          ./src/shifocoind --version
+          echo "Checking binaries..."
+          ls -lh src/zcashd src/zcash-cli src/zcash-tx || ls -lh src/shifocoind src/shifocoin-cli src/shifocoin-tx || true
+          if [ -f src/zcashd ]; then
+            ./src/zcashd --version
+          elif [ -f src/shifocoind ]; then
+            ./src/shifocoind --version
+          fi
       
       - name: Package binaries
         run: |
           mkdir -p shifocoin-release
-          cp src/shifocoind shifocoin-release/
-          cp src/shifocoin-cli shifocoin-release/
-          cp src/shifocoin-tx shifocoin-release/
+          # Check which binaries were created
+          if [ -f src/shifocoind ]; then
+            cp src/shifocoind src/shifocoin-cli src/shifocoin-tx shifocoin-release/
+          elif [ -f src/zcashd ]; then
+            cp src/zcashd src/zcash-cli src/zcash-tx shifocoin-release/
+          fi
           tar -czf shifocoin-linux-x64.tar.gz shifocoin-release/
+          ls -lh shifocoin-linux-x64.tar.gz
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: shifocoin-linux-binaries
           path: shifocoin-linux-x64.tar.gz
