@@ -1,7 +1,7 @@
 name: Build Shifocoin
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger
   push:
     branches: [ main, master ]
 
@@ -36,7 +36,7 @@ jobs:
           path: ~/.zcash-params
           key: zcash-params-v1
       
-      - name: Download parameters
+      - name: Download Zcash parameters
         if: steps.cache-params.outputs.cache-hit != 'true'
         run: ./zcutil/fetch-params.sh
       
@@ -46,13 +46,15 @@ jobs:
       
       - name: Verify build
         run: |
-          ls -lh src/shifocoind src/shifocoin-cli
+          ls -lh src/shifocoind src/shifocoin-cli src/shifocoin-tx
           ./src/shifocoind --version
       
       - name: Package binaries
         run: |
-          mkdir shifocoin-release
-          cp src/shifocoind src/shifocoin-cli src/shifocoin-tx shifocoin-release/
+          mkdir -p shifocoin-release
+          cp src/shifocoind shifocoin-release/
+          cp src/shifocoin-cli shifocoin-release/
+          cp src/shifocoin-tx shifocoin-release/
           tar -czf shifocoin-linux-x64.tar.gz shifocoin-release/
       
       - name: Upload artifacts
