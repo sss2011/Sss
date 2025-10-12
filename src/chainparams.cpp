@@ -282,12 +282,6 @@ genesis = CreateGenesisBlock(
     ParseHex("00"),  // Will mine this
     0x1f07ffff, 4, 0);
 consensus.hashGenesisBlock = genesis.GetHash();
-// assert(consensus.hashGenesisBlock == uint256S("0x1f2d0e3f6c2e1f3b62e35f6c7c
-// a1db1266ea15dd06b4a8a5c453883c000b031973dce08"));
-
-// assert(genesis.hashMerkleRoot == uint256S("0xc4eaa58879081de3c24a7b1
-// 17ed2b28300e7ec4c4c1dff1d3f1268b7857a4ddb"));
-
 
         vFixedSeeds.clear();
         vSeeds.clear();// Shifocoin seed nodes - ADD YOUR OWN SEED NODES HERE LATER
