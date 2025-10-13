@@ -1,85 +1,67 @@
-Zcash 6.10.0
+# Shifocoin 1.0.0
+
 <img align="right" width="120" height="80" src="doc/imgs/logo.png">
-===========
 
-What is Zcash?
---------------
+## What is Shifocoin?
 
-[Zcash](https://z.cash/) is HTTPS for money.
+**Shifocoin** is a privacy-focused cryptocurrency forked from [Zcash](https://z.cash/), offering **optional privacy** for users who want control over their transaction visibility.
 
-Initially based on Bitcoin's design, Zcash has been developed from
-the Zerocash protocol to offer a far higher standard of privacy and
-anonymity. It uses a sophisticated zero-knowledge proving scheme to
-preserve confidentiality and hide the connections between shielded
-transactions. More technical details are available in our
-[Protocol Specification](https://zips.z.cash/protocol/protocol.pdf).
+Built on the proven Zcash codebase with Zerocash protocol, Shifocoin provides:
+- **Optional Shielded Transactions** - Privacy by choice
+- **Transparent Transactions** - For regulatory compliance
+- **Total Supply:** 144 million SHFO
+- **Custom Distribution:** 14.59% Founder + 7% Mining Pool + 78.41% Miners
+- **Network Port:** 9033
+- **Ticker Symbol:** SHFO
 
-## The `zcashd` Full Node
+### Privacy by Choice, Freedom by Design
 
-This repository hosts the `zcashd` software, a Zcash consensus node
-implementation. It downloads and stores the entire history of Zcash
-transactions. Depending on the speed of your computer and network
-connection, the synchronization process could take several days.
+Unlike Monero's mandatory privacy, Shifocoin gives users the freedom to choose between transparent and shielded transactions based on their needs.
 
-<p align="center">
-  <img src="doc/imgs/zcashd_screen.gif" height="500">
-</p>
+---
 
-The `zcashd` code is derived from a source fork of
-[Bitcoin Core](https://github.com/bitcoin/bitcoin). The code was forked
-initially from Bitcoin Core v0.11.2, and the two codebases have diverged
-substantially.
+## The `shifocoind` Full Node
 
-#### :lock: Security Warnings
+This repository hosts the `shifocoind` software, a Shifocoin consensus node implementation based on Zcash's `zcashd`. It downloads and stores the entire history of Shifocoin transactions.
 
-See important security warnings on the
-[Security Information page](https://z.cash/support/security/).
+The code is derived from [Zcash](https://github.com/zcash/zcash), which itself forked from [Bitcoin Core v0.11.2](https://github.com/bitcoin/bitcoin).
 
-**Zcash is experimental and a work in progress.** Use it at your own risk.
+---
 
-####  :ledger: Deprecation Policy
+## :lock: Security Warnings
 
-This release is considered deprecated 16 weeks after the release day. There
-is an automatic deprecation shutdown feature which will halt the node some
-time after this 16-week period. The automatic feature is based on block
-height.
+**Shifocoin is experimental and a work in progress.** Use it at your own risk.
 
-## Other Zcash Implementations
+- Keep your private keys secure
+- Never share your seed phrases
+- Use official wallet software only
+- Verify all downloads and checksums
 
-The [Zebra](https://github.com/ZcashFoundation/zebra) project offers a
-different Zcash consensus node implementation, written largely from the
-ground up.
+---
+
+## Key Differences from Zcash
+
+| Feature | Zcash | Shifocoin |
+|---------|-------|-----------|
+| **Total Supply** | 21 million ZEC | 144 million SHFO |
+| **Ticker** | ZEC | SHFO |
+| **Network Magic** | 0x24e92764 | 0x53484F4F (SHFO) |
+| **Default Port** | 8233 | 9033 |
+| **Distribution** | 80% miners, 20% dev | 78.41% miners, 14.59% founder, 7% pool |
+| **Address Prefix** | t1/t3, zs | Sf/Sh, zs |
+
+---
 
 ## Getting Started
 
-Please see our [user
-guide](https://zcash.readthedocs.io/en/latest/rtd_pages/rtd_docs/user_guide.html)
-for instructions on joining the main Zcash network.
+### Prerequisites
 
-### Need Help?
+- Linux (Debian/Ubuntu recommended)
+- 4GB+ RAM
+- 20GB+ free disk space
+- Stable internet connection
 
-* :blue_book: See the documentation at the [ReadTheDocs](https://zcash.readthedocs.io)
-  for help and more information.
-* :incoming_envelope: Ask for help on the [Zcash forum](https://forum.zcashcommunity.com/).
-* :speech_balloon: Join our community on the [Zcash Global Discord](https://discord.com/invite/zcash).
-* 🧑‍🎓: Learn at [ZecHub](https://zechub.wiki/)
+### Building from Source
 
-Participation in the Zcash project is subject to a
-[Code of Conduct](code_of_conduct.md).
+Build Shifocoin with most dependencies from source:
 
-### Building
-
-Build Zcash along with most dependencies from source by running the following command:
-
-```
-./zcutil/build.sh -j$(nproc)
-```
-
-Currently, Zcash is only officially supported on Debian and Ubuntu. See the
-[Debian / Ubuntu build page](https://zcash.readthedocs.io/en/latest/rtd_pages/Debian-Ubuntu-build.html)
-for detailed instructions.
-
-License
--------
-
-For license information see the file [COPYING](COPYING).
