@@ -275,7 +275,7 @@ keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x3F,0xBD};
         vAlertPubKey = ParseHex("04b7ecf0baa90495ceb4e4090f6b2fd37eec1e9c85fac68a487f3ce11589692e4a317479316ee814e066638e1db54e37a10689b70286e6315b1087b6615d179264");
         nDefaultPort = 9033;    // Shifocoin port
         nPruneAfterHeight = 100000;
-a1db1266ea15dd06b4a8a5c453883c000b031973dce08"));
+
 genesis = CreateGenesisBlock(
     1728163200,  // Unix timestamp for October 2025
     uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"),  // Will mine this
