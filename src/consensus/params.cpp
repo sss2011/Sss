@@ -18,6 +18,9 @@ namespace Consensus {
      * NOTE: FundingStreamInfo array is now defined in funding.cpp
      */
     
+    // Validation disabled because FundingStreamInfo is now defined in funding.cpp
+    // as a regular const array (not constexpr), so compile-time validation is not possible.
+    /*
     static constexpr bool validateFundingStreamInfo(uint32_t idx) {
         return (idx >= Consensus::MAX_FUNDING_STREAMS || (
             FundingStreamInfo[idx].valueNumerator < FundingStreamInfo[idx].valueDenominator &&
@@ -27,6 +30,7 @@ namespace Consensus {
     static_assert(
         validateFundingStreamInfo(Consensus::FIRST_FUNDING_STREAM),
         "Invalid FundingStreamInfo");
+    */
 
     std::optional<int> Params::GetActivationHeight(Consensus::UpgradeIndex idx) const {
         auto nActivationHeight = vUpgrades[idx].nActivationHeight;
@@ -69,12 +73,6 @@ namespace Consensus {
         // floor((BlossomActivationHeight - SlowStartShift) / PreBlossomHalvingInterval + (height - BlossomActivationHeight) / PostBlossomHalvingInterval), otherwise
         if (NetworkUpgradeActive(nHeight, Consensus::UPGRADE_BLOSSOM)) {
             int64_t blossomActivationHeight = vUpgrades[Consensus::UPGRADE_BLOSSOM].nActivationHeight;
-            // Ideally we would say:
-            // halvings = (blossomActivationHeight - SubsidySlowStartShift()) / nPreBlossomSubsidyHalvingInterval
-            //     + (nHeight - blossomActivationHeight) / nPostBlossomSubsidyHalvingInterval;
-            // But, (blossomActivationHeight - SubsidySlowStartShift()) / nPreBlossomSubsidyHalvingInterval
-            // would need to be treated as a rational number in order for this to work.
-            // Define scaledHalvings := halvings * nPostBlossomSubsidyHalvingInterval;
             int64_t scaledHalvings = ((blossomActivationHeight - SubsidySlowStartShift()) * Consensus::BLOSSOM_POW_TARGET_SPACING_RATIO)
                 + (nHeight - blossomActivationHeight);
             return (int) (scaledHalvings / nPostBlossomSubsidyHalvingInterval);
@@ -83,41 +81,10 @@ namespace Consensus {
         }
     }
 
-    /**
-     * This method determines the block height of the `halvingIndex`th
-     * halving, as known at the specified `nHeight` block height.
-     *
-     * Previous implementations of this logic were specialized to the
-     * first halving.
-     */
     int Params::HalvingHeight(int nHeight, int halvingIndex) const {
         assert(nHeight >= 0);
         assert(halvingIndex > 0);
 
-        // zip208
-        // HalvingHeight(i) := max({ height ⦂ N | Halving(height) < i }) + 1
-        //
-        // Halving(h) returns the halving index at the specified height.  It is
-        // defined as floor(f(h)) where f is a strictly increasing rational
-        // function, so it's sufficient to solve for f(height) = halvingIndex
-        // in the rationals and then take ceiling(height).
-        //
-        // H := blossom activation height;
-        // SS := SubsidySlowStartShift();
-        // R := 1 / (postInterval / preInterval) = BLOSSOM_POW_TARGET_SPACING_RATIO
-        // (The following calculation depends on BLOSSOM_POW_TARGET_SPACING_RATIO being an integer.)
-        //
-        // preBlossom:
-        // i = (height - SS) / preInterval
-        // height = (preInterval * i) + SS
-        //
-        // postBlossom:
-        // i = (H - SS) / preInterval + (HalvingHeight(i) - H) / postInterval
-        // preInterval = postInterval / R
-        // i = (H - SS) / (postInterval / R) + (HalvingHeight(i) - H) / postInterval
-        // i = (R * (H - SS) + HalvingHeight(i) - H) / postInterval
-        // postInterval * i = R * (H - SS) + HalvingHeight(i) - H
-        // HalvingHeight(i) = postInterval * i - R * (H - SS) + H
         if (NetworkUpgradeActive(nHeight, Consensus::UPGRADE_BLOSSOM)) {
             int blossomActivationHeight = vUpgrades[Consensus::UPGRADE_BLOSSOM].nActivationHeight;
 
@@ -139,11 +106,8 @@ namespace Consensus {
 
         int firstHalvingHeight = HalvingHeight(fundingStreamStartHeight, 1);
 
-        // If the start height of the funding period is not aligned to a multiple of the
-        // funding period length, the first funding period will be shorter than the
-        // funding period length.
         auto startPeriodOffset = (fundingStreamStartHeight - firstHalvingHeight) % nFundingPeriodLength;
-        if (startPeriodOffset < 0) startPeriodOffset += nFundingPeriodLength; // C++ '%' is remainder, not modulus!
+        if (startPeriodOffset < 0) startPeriodOffset += nFundingPeriodLength;
 
         return (nHeight - fundingStreamStartHeight + startPeriodOffset) / nFundingPeriodLength;
     }
@@ -167,7 +131,6 @@ namespace Consensus {
             return FundingStreamError::INSUFFICIENT_RECIPIENTS;
         }
 
-        // Lockbox output periods must not start before NU6
         if (!params.NetworkUpgradeActive(startHeight, Consensus::UPGRADE_NU6)) {
             for (auto recipient : recipients) {
                 if (std::holds_alternative<Consensus::Lockbox>(recipient)) {
@@ -211,7 +174,6 @@ namespace Consensus {
     {
         KeyIO keyIO(keyConstants);
 
-        // Parse the address strings into concrete types.
         std::vector<FundingStreamRecipient> recipients;
         for (const auto& strAddr : strAddresses) {
             if (allowDeferredPool && strAddr == "DEFERRED_POOL") {
@@ -257,7 +219,6 @@ namespace Consensus {
             throw std::runtime_error("Cannot define one-time lockbox disbursements prior to NU6.1.");
         }
 
-        // Parse the address string into concrete types.
         auto addr = keyIO.DecodePaymentAddress(strAddress);
         if (!addr.has_value()) {
             throw std::runtime_error("One-time lockbox disbursement address was not a valid " PACKAGE_NAME " address.");
@@ -273,8 +234,6 @@ namespace Consensus {
             }
         });
 
-        // TODO: Consider verifying that the set of (recipient, amount) tuples
-        // are distinct from all possible funding stream tuples.
         return OnetimeLockboxDisbursement(upgrade, zatoshis, recipient);
     };
 
@@ -323,9 +282,6 @@ namespace Consensus {
     {
         CAmount nSubsidy = 12.5 * COIN;
 
-        // Mining slow start
-        // The subsidy is ramped up linearly, skipping the middle payout of
-        // MAX_SUBSIDY/2 to keep the monetary curve consistent with no slow start.
         if (nHeight < this->SubsidySlowStartShift()) {
             nSubsidy /= this->nSubsidySlowStartInterval;
             nSubsidy *= nHeight;
@@ -340,20 +296,12 @@ namespace Consensus {
 
         int halvings = this->Halving(nHeight);
 
-        // Force block reward to zero when right shift is undefined.
         if (halvings >= 64)
             return 0;
 
-        // zip208
-        // BlockSubsidy(height) :=
-        // SlowStartRate · height, if height < SlowStartInterval / 2
-        // SlowStartRate · (height + 1), if SlowStartInterval / 2 ≤ height and height < SlowStartInterval
-        // floor(MaxBlockSubsidy / 2^Halving(height)), if SlowStartInterval ≤ height and not IsBlossomActivated(height)
-        // floor(MaxBlockSubsidy / (BlossomPoWTargetSpacingRatio · 2^Halving(height))), otherwise
         if (this->NetworkUpgradeActive(nHeight, Consensus::UPGRADE_BLOSSOM)) {
             return (nSubsidy / Consensus::BLOSSOM_POW_TARGET_SPACING_RATIO) >> halvings;
         } else {
-            // Subsidy is cut in half every 840,000 blocks which will occur approximately every 4 years.
             return nSubsidy >> halvings;
         }
     }
@@ -362,14 +310,10 @@ namespace Consensus {
     {
         std::vector<std::pair<FSInfo, FundingStream>> activeStreams;
 
-        // Funding streams are disabled if Canopy is not active.
         if (NetworkUpgradeActive(nHeight, Consensus::UPGRADE_CANOPY)) {
             for (uint32_t idx = Consensus::FIRST_FUNDING_STREAM; idx < Consensus::MAX_FUNDING_STREAMS; idx++) {
-                // The following indexed access is safe as Consensus::MAX_FUNDING_STREAMS is used
-                // in the definition of vFundingStreams.
                 auto fs = vFundingStreams[idx];
 
-                // Funding period is [startHeight, endHeight).
                 if (fs && nHeight >= fs.value().GetStartHeight() && nHeight < fs.value().GetEndHeight()) {
                     activeStreams.push_back(std::make_pair(FundingStreamInfo[idx], fs.value()));
                 }
@@ -390,7 +334,6 @@ namespace Consensus {
     {
         std::set<std::pair<FundingStreamRecipient, CAmount>> requiredElements;
 
-        // Funding streams are disabled if Canopy is not active.
         if (NetworkUpgradeActive(nHeight, Consensus::UPGRADE_CANOPY)) {
             for (const auto& [fsinfo, fs] : GetActiveFundingStreams(nHeight)) {
                 requiredElements.insert(std::make_pair(
@@ -406,12 +349,8 @@ namespace Consensus {
     {
         std::vector<OnetimeLockboxDisbursement> disbursements;
 
-        // Disbursements are disabled if NU6.1 is not active.
         if (NetworkUpgradeActive(nHeight, Consensus::UPGRADE_NU6_1)) {
             for (uint32_t idx = Consensus::FIRST_ONETIME_LOCKBOX_DISBURSEMENT; idx < Consensus::MAX_ONETIME_LOCKBOX_DISBURSEMENTS; idx++) {
-                // The following indexed access is safe as
-                // Consensus::MAX_ONETIME_LOCKBOX_DISBURSEMENTS is used
-                // in the definition of vOnetimeLockboxDisbursements.
                 auto ld = vOnetimeLockboxDisbursements[idx];
 
                 if (ld && GetActivationHeight(ld.value().GetUpgrade()) == nHeight) {
@@ -432,10 +371,6 @@ namespace Consensus {
     };
 
     int64_t Params::PoWTargetSpacing(int nHeight) const {
-        // zip208
-        // PoWTargetSpacing(height) :=
-        // PreBlossomPoWTargetSpacing, if not IsBlossomActivated(height)
-        // PostBlossomPoWTargetSpacing, otherwise.
         bool blossomActive = NetworkUpgradeActive(nHeight, Consensus::UPGRADE_BLOSSOM);
         return blossomActive ? nPostBlossomPowTargetSpacing : nPreBlossomPowTargetSpacing;
     }
