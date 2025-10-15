@@ -177,11 +177,11 @@ keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x3F,0xBD};
             auto nu6Activation = consensus.vUpgrades[Consensus::UPGRADE_NU6].nActivationHeight;
             auto nu6_1Activation = consensus.vUpgrades[Consensus::UPGRADE_NU6_1].nActivationHeight;
         // SHIFOCOIN CUSTOM DISTRIBUTION
-        // 14.59% to Founder + 7% to Mining Pool + 78.41% to Miners
-        // TODO: Replace these placeholder addresses with actual Shifocoin addresses after first build
-        
-        std::vector<std::string> founder_addresses(48, "YOUR_SHIFOCOIN_FOUNDER_ADDRESS_REPLACE_ME");
-        std::vector<std::string> mining_pool_addresses(48, "YOUR_MINING_POOL_ADDRESS_REPLACE_ME");
+// 14.59% to Founder + 7% to Mining Pool + 78.41% to Miners
+// Using temporary valid addresses - replace with real Shifocoin addresses after genesis mining
+
+std::vector<std::string> founder_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
+std::vector<std::string> mining_pool_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
 
         // Add founder reward stream (14.59%)
         consensus.AddZIP207FundingStream(
