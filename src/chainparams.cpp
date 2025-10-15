@@ -179,7 +179,6 @@ keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x3F,0xBD};
         // SHIFOCOIN CUSTOM DISTRIBUTION
 // 14.59% to Founder + 7% to Mining Pool + 78.41% to Miners
 // Using temporary valid addresses - replace with real Shifocoin addresses after genesis mining
-
 std::vector<std::string> founder_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
 std::vector<std::string> mining_pool_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
 
