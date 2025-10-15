@@ -203,8 +203,8 @@ std::vector<std::string> mining_pool_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXy
 
 
             // ZIP 214 Revision 1
-// FPF uses a single address repeated 12 times, once for each funding period.
-std::vector<std::string> fpf_addresses(12, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
+            // FPF uses a single address repeated 12 times, once for each funding period.
+            std::vector<std::string> fpf_addresses(12, "t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow");
 
             consensus.AddZIP207FundingStream(
                 keyConstants,
@@ -219,9 +219,8 @@ std::vector<std::string> fpf_addresses(12, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi"
                 nu6_1Activation);
 
             // ZIP 214 Revision 2
-// FPF uses a single address repeated 36 times, once for each funding period.
-std::vector<std::string> fpf_addresses_h3(36, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi");
-
+            // FPF uses a single address repeated 36 times, once for each funding period.
+            std::vector<std::string> fpf_addresses_h3(36, "t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow");
             consensus.AddZIP207FundingStream(
                 keyConstants,
                 Consensus::FS_FPF_ZCG_H3,
@@ -236,7 +235,7 @@ std::vector<std::string> fpf_addresses_h3(36, "t2UNzUUx8mWBCRYPRezvA363EYXyEpHok
 
             // ZIP 271
             // For convenience of distribution, we split the lockbox contents into 10 equal chunks.
-            std::string nu6_1_kho_address = "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi"";
+            std::string nu6_1_kho_address = "t3ev37Q2uL1sfTsiJQJiWJoFzQpDhmnUwYo";
             static const CAmount nu6_1_disbursement_amount = 78750 * COIN;
             static const CAmount nu6_1_chunk_amount = 7875 * COIN;
             static constexpr auto nu6_1_chunks = {
