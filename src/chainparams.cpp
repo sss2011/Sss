@@ -338,57 +338,58 @@ consensus.hashGenesisBlock = genesis.GetHash();
         fZIP209Enabled = true;
         hashSproutValuePoolCheckpointBlock = uint256S("0000000000c7b46b6bc04b4cbf87d8bb08722aebd51232619b214f7273f8460e");
 
-        // Founders reward script expects a vector of 2-of-3 multisig addresses
-        vFoundersRewardAddress = {
-            "t3Vz22vK5z2LcKEdg16Yv4FFneEL1zg9ojd", /* main-index: 0*/
-            "t3cL9AucCajm3HXDhb5jBnJK2vapVoXsop3", /* main-index: 1*/
-            "t3fqvkzrrNaMcamkQMwAyHRjfDdM2xQvDTR", /* main-index: 2*/
-            "t3TgZ9ZT2CTSK44AnUPi6qeNaHa2eC7pUyF", /* main-index: 3*/
-            "t3SpkcPQPfuRYHsP5vz3Pv86PgKo5m9KVmx", /* main-index: 4*/
-            "t3Xt4oQMRPagwbpQqkgAViQgtST4VoSWR6S", /* main-index: 5*/
-            "t3ayBkZ4w6kKXynwoHZFUSSgXRKtogTXNgb", /* main-index: 6*/
-            "t3adJBQuaa21u7NxbR8YMzp3km3TbSZ4MGB", /* main-index: 7*/
-            "t3K4aLYagSSBySdrfAGGeUd5H9z5Qvz88t2", /* main-index: 8*/
-            "t3RYnsc5nhEvKiva3ZPhfRSk7eyh1CrA6Rk", /* main-index: 9*/
-            "t3Ut4KUq2ZSMTPNE67pBU5LqYCi2q36KpXQ", /* main-index: 10*/
-            "t3ZnCNAvgu6CSyHm1vWtrx3aiN98dSAGpnD", /* main-index: 11*/
-            "t3fB9cB3eSYim64BS9xfwAHQUKLgQQroBDG", /* main-index: 12*/
-            "t3cwZfKNNj2vXMAHBQeewm6pXhKFdhk18kD", /* main-index: 13*/
-            "t3YcoujXfspWy7rbNUsGKxFEWZqNstGpeG4", /* main-index: 14*/
-            "t3bLvCLigc6rbNrUTS5NwkgyVrZcZumTRa4", /* main-index: 15*/
-            "t3VvHWa7r3oy67YtU4LZKGCWa2J6eGHvShi", /* main-index: 16*/
-            "t3eF9X6X2dSo7MCvTjfZEzwWrVzquxRLNeY", /* main-index: 17*/
-            "t3esCNwwmcyc8i9qQfyTbYhTqmYXZ9AwK3X", /* main-index: 18*/
-            "t3M4jN7hYE2e27yLsuQPPjuVek81WV3VbBj", /* main-index: 19*/
-            "t3gGWxdC67CYNoBbPjNvrrWLAWxPqZLxrVY", /* main-index: 20*/
-            "t3LTWeoxeWPbmdkUD3NWBquk4WkazhFBmvU", /* main-index: 21*/
-            "t3P5KKX97gXYFSaSjJPiruQEX84yF5z3Tjq", /* main-index: 22*/
-            "t3f3T3nCWsEpzmD35VK62JgQfFig74dV8C9", /* main-index: 23*/
-            "t3Rqonuzz7afkF7156ZA4vi4iimRSEn41hj", /* main-index: 24*/
-            "t3fJZ5jYsyxDtvNrWBeoMbvJaQCj4JJgbgX", /* main-index: 25*/
-            "t3Pnbg7XjP7FGPBUuz75H65aczphHgkpoJW", /* main-index: 26*/
-            "t3WeKQDxCijL5X7rwFem1MTL9ZwVJkUFhpF", /* main-index: 27*/
-            "t3Y9FNi26J7UtAUC4moaETLbMo8KS1Be6ME", /* main-index: 28*/
-            "t3aNRLLsL2y8xcjPheZZwFy3Pcv7CsTwBec", /* main-index: 29*/
-            "t3gQDEavk5VzAAHK8TrQu2BWDLxEiF1unBm", /* main-index: 30*/
-            "t3Rbykhx1TUFrgXrmBYrAJe2STxRKFL7G9r", /* main-index: 31*/
-            "t3aaW4aTdP7a8d1VTE1Bod2yhbeggHgMajR", /* main-index: 32*/
-            "t3YEiAa6uEjXwFL2v5ztU1fn3yKgzMQqNyo", /* main-index: 33*/
-            "t3g1yUUwt2PbmDvMDevTCPWUcbDatL2iQGP", /* main-index: 34*/
-            "t3dPWnep6YqGPuY1CecgbeZrY9iUwH8Yd4z", /* main-index: 35*/
-            "t3QRZXHDPh2hwU46iQs2776kRuuWfwFp4dV", /* main-index: 36*/
-            "t3enhACRxi1ZD7e8ePomVGKn7wp7N9fFJ3r", /* main-index: 37*/
-            "t3PkLgT71TnF112nSwBToXsD77yNbx2gJJY", /* main-index: 38*/
-            "t3LQtHUDoe7ZhhvddRv4vnaoNAhCr2f4oFN", /* main-index: 39*/
-            "t3fNcdBUbycvbCtsD2n9q3LuxG7jVPvFB8L", /* main-index: 40*/
-            "t3dKojUU2EMjs28nHV84TvkVEUDu1M1FaEx", /* main-index: 41*/
-            "t3aKH6NiWN1ofGd8c19rZiqgYpkJ3n679ME", /* main-index: 42*/
-            "t3MEXDF9Wsi63KwpPuQdD6by32Mw2bNTbEa", /* main-index: 43*/
-            "t3WDhPfik343yNmPTqtkZAoQZeqA83K7Y3f", /* main-index: 44*/
-            "t3PSn5TbMMAEw7Eu36DYctFezRzpX1hzf3M", /* main-index: 45*/
-            "t3R3Y5vnBLrEn8L6wFjPjBLnxSUQsKnmFpv", /* main-index: 46*/
-            "t3Pcm737EsVkGTbhsu2NekKtJeG92mvYyoN", /* main-index: 47*/
-        };
+       // Founders reward script expects a vector of 2-of-3 multisig addresses
+vFoundersRewardAddress = {
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 0*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 1*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 2*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 3*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 4*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 5*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 6*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 7*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 8*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 9*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 10*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 11*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 12*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 13*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 14*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 15*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 16*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 17*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 18*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 19*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 20*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 21*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 22*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 23*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 24*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 25*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 26*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 27*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 28*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 29*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 30*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 31*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 32*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 33*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 34*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 35*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 36*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 37*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 38*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 39*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 40*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 41*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 42*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 43*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 44*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 45*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 46*/
+    "t2UNzUUx8mWBCRYPRezvA363EYXyEpHokyi", /* main-index: 47*/
+};
+
 
         assert(vFoundersRewardAddress.size() <= consensus.GetLastFoundersRewardBlockHeight(0));
     }
