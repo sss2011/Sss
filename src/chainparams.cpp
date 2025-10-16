@@ -148,12 +148,12 @@ public:
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
 
         consensus.nFundingPeriodLength = consensus.nPostBlossomSubsidyHalvingInterval / 48;
-// guarantees the first 2 characters, when base58 encoded, are "Sf"
-keyConstants.base58Prefixes[PUBKEY_ADDRESS]     = {0x3F,0xB8};
-// guarantees the first 2 characters, when base58 encoded, are "Sh"
-keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x3F,0xBD};
-
-        // the first character, when base58 encoded, is "5" or "K" or "L" (as in Bitcoin)
+// SHIFOCOIN TEMPORARY FIX: Use testnet prefixes to match t2 addresses
+// guarantees the first 2 characters are "tm" (testnet mainnet)
+keyConstants.base58Prefixes[PUBKEY_ADDRESS]     = {0x1D,0x25};
+// guarantees the first 2 characters are "t2" (testnet script)
+keyConstants.base58Prefixes[SCRIPT_ADDRESS]     = {0x1C,0xBA};
+     // the first character, when base58 encoded, is "5" or "K" or "L" (as in Bitcoin)
         keyConstants.base58Prefixes[SECRET_KEY]         = {0x80};
         // do not rely on these BIP32 prefixes; they are not specified and may change
         keyConstants.base58Prefixes[EXT_PUBLIC_KEY]     = {0x04,0x88,0xB2,0x1E};
