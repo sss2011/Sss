@@ -1,0 +1,257 @@
+name: Build and Test Shifocoin
+
+# Triggers: Run on push to main, pull requests, or manual dispatch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
+# Environment variables for the build
+env:
+  CC: gcc
+  CXX: g++
+  BUILD_DIR: build/
+  INSTALL_DIR: shifocoin-release/
+
+jobs:
+  build-and-test:
+    # Use Ubuntu 24.04 to match your target environment
+    runs-on: ubuntu-24.04
+    
+    steps:
+      # Step 1: Checkout your repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # If your repo has submodules (common for Zcash forks)
+      
+      # Step 2: Install dependencies (adapt for Shifocoin/Zcash requirements)
+      - name: Install dependencies
+        run: |
+          # Core build tools for Zcash/Shifocoin
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libtool \
+            autotools-dev \
+            automake \
+            pkg-config \
+            libssl-dev \
+            libevent-dev \
+            bsdmainutils \
+            libboost-system-dev \
+            libboost-filesystem-dev \
+            libboost-test-dev \
+            libboost-thread-dev \
+            libdb++-dev \
+            libzmq3-dev \
+            libqrencode-dev \
+            python3 \
+            libminiupnpc-dev \
+            libgmp-dev \
+            libsnark-dev  # Or your privacy library equivalent
+          
+          # For Ubuntu 24.04 specific packages
+          sudo apt-get install -y libsqlite3-dev
+          
+          # Verify installation
+          gcc --version
+          make --version
+      
+      # Step 3: Build Shifocoin binaries from source
+      - name: Build Shifocoin
+        run: |
+          # Standard Zcash/Shifocoin build process
+          ./autogen.sh
+          
+          # Configure for release build (optimized, no debug)
+          ./configure \
+            --with-incompatible-bdb \
+            --disable-bench \
+            --disable-tests \
+            --enable-glibc-back-compat \
+            --prefix=$INSTALL_DIR
+          
+          # Compile (use -j for parallel build)
+          make -j$(nproc)
+          
+          # Install to staging directory
+          make install DESTDIR=$BUILD_DIR
+      
+      # Step 4: Package binaries for artifact
+      - name: Package binaries
+        run: |
+          cd $BUILD_DIR
+          # Create tar.gz with just the essentials
+          mkdir -p $INSTALL_DIR/bin
+          mkdir -p $INSTALL_DIR/lib
+          
+          # Copy main executables
+          cp src/zcashd bin/
+          cp src/zcash-cli bin/
+          cp src/zcash-tx bin/
+          cp src/.libs/libzcashconsensus.so.0.0.0 lib/ || true  # Handle if not present
+          
+          # Create example config
+          mkdir -p $INSTALL_DIR/share/zcash
+          cp contrib/zcash.conf.example share/zcash/zcash.conf.example || \
+            echo "rpcuser=default\nrpcpassword=changeme\nserver=1" > share/zcash/zcash.conf.example
+          
+          # Package everything
+          tar -czf ../shifocoin-linux-x64.tar.gz -C $INSTALL_DIR .
+          
+          # Verify package contents
+          tar -tzf ../shifocoin-linux-x64.tar.gz
+          ls -la ../shifocoin-linux-x64.tar.gz
+      
+      # Step 5: Create ZIP artifact (mimics your current artifact)
+      - name: Create artifact ZIP
+        run: |
+          # Zip the tar.gz for GitHub artifact upload
+          zip -r shifocoin-linux-binaries.zip shifocoin-linux-x64.tar.gz
+          
+          # Verify SHA256 (for your integrity check)
+          sha256sum shifocoin-linux-binaries.zip > artifact-sha256.txt
+          cat artifact-sha256.txt
+      
+      # Step 6: Test binaries inline (no download needed)
+      - name: Extract and test binaries
+        run: |
+          # Extract the packaged binaries
+          unzip shifocoin-linux-binaries.zip
+          tar -xzf shifocoin-linux-x64.tar.gz
+          
+          # Enter the release directory and set permissions
+          cd shifocoin-release
+          chmod +x bin/zcashd bin/zcash-cli bin/zcash-tx
+          
+          # Verify binaries are executable
+          file bin/zcashd  # Should show ELF 64-bit executable
+          ls -la bin/
+          
+          # Create test config for regtest
+          mkdir -p ~/.zcash
+          cat > ~/.zcash/zcash.conf << EOF
+          regtest=1
+          rpcuser=shifoUser
+          rpcpassword=StrongPassword1234!
+          rpcallowip=127.0.0.1
+          server=1
+          txindex=1
+          blocksonly=0  # Full validation
+          EOF
+          
+          # Start regtest daemon
+          echo "Starting zcashd regtest..."
+          ./bin/zcashd -regtest -daemon
+          
+          # Wait for startup (increase if needed)
+          sleep 15
+          
+          # Monitor startup logs
+          tail -20 ~/.zcash/regtest/debug.log
+          
+          # Test RPC connectivity and version
+          echo "Testing getnetworkinfo..."
+          ./bin/zcash-cli -regtest getnetworkinfo > networkinfo.json
+          
+          # Validate JSON output (basic checks)
+          if grep -q '"chain": "regtest"' networkinfo.json && grep -q '"version":' networkinfo.json; then
+            echo "✅ Regtest network info valid"
+          else
+            echo "❌ Regtest network info invalid"
+            cat networkinfo.json
+            exit 1
+          fi
+          
+          # Test blockchain info
+          ./bin/zcash-cli -regtest getblockchaininfo > blockchaininfo.json
+          if grep -q '"blocks": 0' blockchaininfo.json && grep -q '"difficulty": 1' blockchaininfo.json; then
+            echo "✅ Blockchain info valid (initial state)"
+          else
+            echo "❌ Blockchain info invalid"
+            cat blockchaininfo.json
+            exit 1
+          fi
+          
+          # Mine a test block
+          echo "Mining test block..."
+          ADDRESS=$(./bin/zcash-cli -regtest getnewaddress)
+          ./bin/zcash-cli -regtest generatetoaddress 1 "$ADDRESS"
+          
+          # Verify block was mined
+          ./bin/zcash-cli -regtest getblockchaininfo > blockchaininfo-after.json
+          BLOCK_COUNT=$(grep -o '"blocks": [0-9]*' blockchaininfo-after.json | cut -d: -f2 | xargs)
+          if [ "$BLOCK_COUNT" -eq 1 ]; then
+            echo "✅ Block mining successful (blocks: $BLOCK_COUNT)"
+          else
+            echo "❌ Block mining failed (blocks: $BLOCK_COUNT)"
+            exit 1
+          fi
+          
+          # Test mainnet startup (quick validation)
+          echo "Testing mainnet parameter validation..."
+          sed -i 's/^regtest=1/#regtest=1/' ~/.zcash/zcash.conf
+          
+          # Start mainnet (should load without genesis errors)
+          ./bin/zcashd -daemon
+          sleep 10
+          
+          # Check basic mainnet info (expect warnings about genesis)
+          ./bin/zcash-cli getnetworkinfo > mainnet-info.json
+          if grep -q '"chain": "main"' mainnet-info.json; then
+            echo "✅ Mainnet startup successful"
+          else
+            echo "❌ Mainnet startup failed"
+            cat ~/.zcash/debug.log
+            exit 1
+          fi
+          
+          # Stop nodes and capture final logs
+          ./bin/zcash-cli stop
+          sleep 5
+          tail -30 ~/.zcash/debug.log > test-debug.log
+          
+          echo "All tests passed! Binaries are functional."
+          echo "Final debug log saved to test-debug.log"
+      
+      # Step 7: Upload successful artifact and test logs
+      - name: Upload artifact (only if tests pass)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shifocoin-linux-binaries
+          path: |
+            shifocoin-linux-binaries.zip
+            artifact-sha256.txt
+          retention-days: 30  # Keep for 30 days
+      
+      # Upload test logs as separate artifact
+      - name: Upload test results
+        if: always()  # Upload even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: shifocoin-test-logs
+          path: |
+            networkinfo.json
+            blockchaininfo.json
+            test-debug.log
+            ~/.zcash/regtest/debug.log
+            ~/.zcash/debug.log
+          retention-days: 7
+      
+      # Step 8: Summary of results
+      - name: Workflow summary
+        if: always()
+        run: |
+          echo "## Shifocoin Build & Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner**: ubuntu-24.04" >> $GITHUB_STEP_SUMMARY
+          echo "- **Artifact Size**: $(du -h shifocoin-linux-binaries.zip | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          if [ -f artifact-sha256.txt ]; then
+            echo "- **SHA256**: $(cat artifact-sha256.txt)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "### Test Logs Available" >> $GITHUB_STEP_SUMMARY
+          echo "Download 'shifocoin-test-logs' artifact to review debug.log and JSON outputs." >> $GITHUB_STEP_SUMMARY
