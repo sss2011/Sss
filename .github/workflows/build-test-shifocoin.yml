@@ -1,19 +1,25 @@
-      - name: Test binaries
-        run: |
-          unzip shifocoin-linux-binaries.zip
-          tar -xzf shifocoin-linux-x64.tar.gz
-          cd shifocoin-release
-          chmod +x bin/zcashd bin/zcash-cli bin/zcash-tx
-          mkdir -p ~/.zcash
-          echo "# Shifocoin Configuration Example" > ~/.zcash/zcash.conf
-          echo "regtest=1" >> ~/.zcash/zcash.conf
-          echo "rpcuser=shifoUser" >> ~/.zcash/zcash.conf
-          echo "rpcpassword=StrongPassword1234!" >> ~/.zcash/zcash.conf
-          echo "rpcallowip=127.0.0.1" >> ~/.zcash/zcash.conf
-          echo "server=1" >> ~/.zcash/zcash.conf
-          echo "txindex=1" >> ~/.zcash/zcash.conf
-          echo "blocksonly=0" >> ~/.zcash/zcash.conf
-          echo "daemon=1" >> ~/.zcash/zcash.conf
-          ./bin/zcashd -regtest -daemon
-          sleep 15
-          ./bin/zcash-cli -regtest getnetworkinfo > networkinfo.json 2>&1 || true
+name: Build and Test Shifocoin
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  CC: gcc
+  CXX: g++
+  BUILD_DIR: build/
+  INSTALL_DIR: shifocoin-release/
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
