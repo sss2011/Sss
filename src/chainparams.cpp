@@ -289,7 +289,8 @@ if (true) {  // Always mine on first run
     while (UintToArith256(genesis.GetHash()) > hashTarget) {
         genesis.nNonce = ArithToUint256(UintToArith256(genesis.nNonce) + 1);
         
-        if ((UintToArith256(genesis.nNonce) % 10000).IsNull()) {
+        if ((UintToArith256(genesis.nNonce) % arith_uint256(10000)).IsNull()) {
+
             printf("Tried %s nonces...\n", UintToArith256(genesis.nNonce).ToString().c_str());
         }
     }
