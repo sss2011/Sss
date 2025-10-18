@@ -282,18 +282,15 @@ genesis = CreateGenesisBlock(
     0x1f07ffff, 4, 0);
 
 // ===== TEMPORARY GENESIS MINING CODE =====
-if (true) {  // Always mine on first run
+if (true) {
     printf("Mining mainnet genesis block...\n");
     arith_uint256 hashTarget = arith_uint256().SetCompact(genesis.nBits);
-    
+
     while (UintToArith256(genesis.GetHash()) > hashTarget) {
         genesis.nNonce = ArithToUint256(UintToArith256(genesis.nNonce) + 1);
-        
-       if (UintToArith256(genesis.nNonce).GetUint64(0) % 10000 == 0) {
-    printf("Tried %s nonces...\n", UintToArith256(genesis.nNonce).ToString().c_str());
-}
+        // REMOVE progress logging here!
     }
-    
+
     printf("\n=== MAINNET GENESIS BLOCK FOUND ===\n");
     printf("nTime: %u\n", genesis.nTime);
     printf("nBits: 0x%08x\n", genesis.nBits);
@@ -305,9 +302,10 @@ if (true) {  // Always mine on first run
         printf("%02x", genesis.nSolution[i]);
     }
     printf("\n===================================\n\n");
-    exit(0);  // Exit after finding genesis
+    exit(0);
 }
 // ===== END MINING CODE =====
+
 
 consensus.hashGenesisBlock = genesis.GetHash();
 
