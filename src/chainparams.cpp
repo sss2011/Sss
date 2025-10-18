@@ -277,9 +277,40 @@ std::vector<std::string> mining_pool_addresses(48, "t2UNzUUx8mWBCRYPRezvA363EYXy
 
 genesis = CreateGenesisBlock(
     1728163200,  // Unix timestamp for October 2025
-    uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"),  // Will mine this
-    ParseHex("00"),  // Will mine this
+    uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"),  
+    ParseHex("00"),  
     0x1f07ffff, 4, 0);
+
+// ===== TEMPORARY GENESIS MINING CODE =====
+if (true) {  // Always mine on first run
+    printf("Mining mainnet genesis block...\n");
+    arith_uint256 hashTarget = arith_uint256().SetCompact(genesis.nBits);
+    
+    while (UintToArith256(genesis.GetHash()) > hashTarget) {
+        genesis.nNonce = ArithToUint256(UintToArith256(genesis.nNonce) + 1);
+        
+        if ((UintToArith256(genesis.nNonce) % 10000).IsNull()) {
+            printf("Tried %s nonces...\n", UintToArith256(genesis.nNonce).ToString().c_str());
+        }
+    }
+    
+    printf("\n=== MAINNET GENESIS BLOCK FOUND ===\n");
+    printf("nTime: %u\n", genesis.nTime);
+    printf("nBits: 0x%08x\n", genesis.nBits);
+    printf("nNonce: %s\n", genesis.nNonce.ToString().c_str());
+    printf("GetHash: %s\n", genesis.GetHash().ToString().c_str());
+    printf("hashMerkleRoot: %s\n", genesis.hashMerkleRoot.ToString().c_str());
+    printf("nSolution (hex): ");
+    for (size_t i = 0; i < genesis.nSolution.size(); i++) {
+        printf("%02x", genesis.nSolution[i]);
+    }
+    printf("\n===================================\n\n");
+    exit(0);  // Exit after finding genesis
+}
+// ===== END MINING CODE =====
+
+consensus.hashGenesisBlock = genesis.GetHash();
+
 consensus.hashGenesisBlock = genesis.GetHash();
 
         vFixedSeeds.clear();
